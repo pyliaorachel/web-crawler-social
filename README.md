@@ -1,6 +1,16 @@
 ## Libraries
 
 * [Scrapy](https://scrapy.org/)
+* [Selenium](http://selenium-python.readthedocs.io/index.html)
+* [geckodriver (driver engine for Firefox)](https://github.com/mozilla/geckodriver)
+
+```
+pip install scrapy
+pip install selenium
+brew install geckodriver
+```
+
+Make sure you have the latest Firefox browser, and Twitter is logged in in the browser.
 
 ## Usage
 
