@@ -4,6 +4,9 @@ import config
 
 level = 3
 
+class TwitterFollowerItem(scrapy.Item):
+    name = scrapy.Field()
+
 class TwitterFollowersSpider(scrapy.Spider):
     name = "twitter-followers"
     allowed_domains = ["twitter.com"]
@@ -28,7 +31,10 @@ class TwitterFollowersSpider(scrapy.Spider):
         )
 
     def parse_followers(self, response):
-        print('name = {}'.format(response.css('h1.ProfileHeaderCard-name a ::text').extract_first().encode('utf-8')))
+        follower_name = response.css('h1.ProfileHeaderCard-name a ::text').extract_first().encode('utf-8')
+        follower = TwitterFollowerItem()
+        follower['name'] = follower_name
+        yield follower
 
         global level
         if level > 0:
