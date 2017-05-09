@@ -7,6 +7,9 @@ from selenium.webdriver.common.keys import Keys
 import time
 import config
 
+class TwitterRetweetsUserItem(scrapy.Item):
+    link = scrapy.Field()
+
 class TwitterRetweetsSpider(scrapy.Spider):
     name = "twitter-retweets"
     allowed_domains = ["twitter.com"]
@@ -68,9 +71,20 @@ class TwitterRetweetsSpider(scrapy.Spider):
         self.driver.find_element_by_css_selector('li.js-stat-retweets.stat-count a.request-retweeted-popup').click()
         time.sleep(1)
 
-        users = self.driver.find_element_by_css_selector('ol.activity-popup-users li div.content a.js-user-profile-link').get_attribute('href')
-        print('users {}'.format(users))
+        users = self.driver.find_elements_by_css_selector('ol.activity-popup-users li div.content a.js-user-profile-link')
+
+        for user in users:
+            retweet_user_link = user.get_attribute('href')
+            retweet_user = TwitterRetweetsUserItem()
+            retweet_user['link'] = retweet_user_link
+            yield retweet_user
 
     def closed(self, spider):
         self.driver.close()
+
+
+
+
+
+
 
