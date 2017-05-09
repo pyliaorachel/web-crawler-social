@@ -3,6 +3,7 @@ import scrapy
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.keys import Keys
 import time
 import config
 
@@ -16,6 +17,7 @@ class TwitterRetweetsSpider(scrapy.Spider):
         self.username = username
         self.num_of_tweets = num_of_tweets
 
+        # setup webdriver
         firefox_capabilities = DesiredCapabilities.FIREFOX.copy()
         firefox_capabilities['marionette'] = True
         firefox_options = Options()
@@ -23,6 +25,17 @@ class TwitterRetweetsSpider(scrapy.Spider):
         self.driver = webdriver.Firefox(capabilities=firefox_capabilities, firefox_options=firefox_options)
 
     def parse(self, response):
+        # login webdriver
+        self.driver.get(response.url)
+        time.sleep(1)
+        username = self.driver.find_element_by_css_selector('input.js-username-field')
+        password = self.driver.find_element_by_css_selector('input.js-password-field')
+        username.send_keys(config.TWITTER_USERNAME)
+        password.send_keys(config.TWITTER_PASSWORD)
+        login_attempt = self.driver.find_element_by_css_selector('.signin button[type=submit]')
+        login_attempt.submit()
+
+        # login scrapy
         return scrapy.FormRequest.from_response(
             response,
             formcss='.signin',
@@ -52,12 +65,11 @@ class TwitterRetweetsSpider(scrapy.Spider):
 
         # press retweet button to open popup
         self.driver.get(response.url)
-        #print self.driver.page_source.encode('utf-8')
         self.driver.find_element_by_css_selector('li.js-stat-retweets.stat-count a.request-retweeted-popup').click()
         time.sleep(1)
 
-        users = response.css('ol.activity-popup-users li::attr(data-item-id)').extract()
-        print('users {}'.format(response.css('ol.activity-popup-users').extract()))
+        users = self.driver.find_element_by_css_selector('ol.activity-popup-users li div.content a.js-user-profile-link').get_attribute('href')
+        print('users {}'.format(users))
 
     def closed(self, spider):
         self.driver.close()
