@@ -26,9 +26,4 @@ class Twitter():
 			return None
 
 		resjson = json.loads(res.read().decode('utf8'))
-		data = {
-			'tweet_id': tweet_id,
-			'timestamp': time.time(),
-			'ids': resjson['ids']
-		}
-		return data
+		return resjson, time.time()

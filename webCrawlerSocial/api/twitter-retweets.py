@@ -10,7 +10,12 @@ def get_retweeters(tweet_id):
 	if token == None:
 		return
 
-	data = Twitter.get_retweeters(token, tweet_id)
+	resjson, timestamp = Twitter.get_retweeters(token, tweet_id)
+	data = {
+		'tweet_id': tweet_id,
+		'timestamp': timestamp,
+		'ids': resjson['ids']
+	}
 	output_json(data, '{}-{}'.format(get_file_basename(__file__), tweet_id))
 
 if __name__ == '__main__':
